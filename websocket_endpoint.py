@@ -3,7 +3,7 @@ from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 class SimpleEcho(WebSocket):
 
     def handleMessage(self):
-        # echo message back to client
+        # do your shit
         self.sendMessage(self.data)
 
     def handleConnected(self):
