@@ -12,6 +12,22 @@ tick = datetime.timedelta(milliseconds=500)
 scenes = {"000": 0, "001": 1, "010": 2, "011": 3, "100": 4, "101": 5, "110": 6, "111": 7}
 groupid = 1
 
+def get_lightstate(light_no, on):
+    if light_no == 1:
+        hue = 25500
+    elif light_no == 2:
+        hue = 46920
+    else:
+        hue = 65280
+    return {
+        'hue': hue,
+        'sat': 255,
+        'bri': 255,
+        'on': on,
+        'transitiontime': 0
+    }
+
+
 def init_scenes(bridge):
     bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
     bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": False, 'transitiontime': 0})
@@ -45,6 +61,18 @@ def init_scenes(bridge):
     bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
     bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
     bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '111', 'lights': ['1', '2', '3'], 'recycle': True})
+    for scene in bridge.scenes:
+        if scene.name in scenes.keys():
+            one = True if scene.name[0] == '1' else False
+            two = True if scene.name[1] == '1' else False
+            three = True if scene.name[2] == '1' else False
+            bridge.request(mode='PUT', address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/1', data=get_lightstate(1, one))
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/2',
+                           data=get_lightstate(2, two))
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/3',
+                           data=get_lightstate(3, three))
 
 
 def say_nrz(bridge, data, lights):
