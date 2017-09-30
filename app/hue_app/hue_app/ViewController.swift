@@ -30,12 +30,15 @@ import Starscream
     }
         
     func captured(image: UIImage) {
-        let jpegCompressionQuality: CGFloat = 0.1 // Set this to whatever suits your purpose
+//        let resizedImage = image.resizeWith(width: 64)
+        let jpegCompressionQuality: CGFloat = 1 // Set this to whatever suits your purpose
         if let base64String = UIImageJPEGRepresentation(image, jpegCompressionQuality)?.base64EncodedString() {
             socket.write(string: base64String)
         }
         imageView.image = image
     }
+        
+   
 }
 
 // MARK: - WebSocketDelegate
@@ -72,5 +75,22 @@ extension ViewController : WebSocketDelegate {
     func websocketDidReceiveData(_ socket: Starscream.WebSocket, data: Data) {
 
     }
+}
+
+
+extension UIImage {
+
+    func resizeWith(width: CGFloat) -> UIImage? {
+        let imageView = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: width, height: CGFloat(ceil(width/size.width * size.height)))))
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = self
+        UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, false, scale)
+        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        imageView.layer.render(in: context)
+        guard let result = UIGraphicsGetImageFromCurrentImageContext() else { return nil }
+        UIGraphicsEndImageContext()
+        return result
+    }
+
 }
 
