@@ -6,6 +6,7 @@ import numpy as np
 
 IMAGE_SIZE = (128, 128)
 
+running = False
 
 def load_image(base64_string):
     sbuf = StringIO()
@@ -19,22 +20,24 @@ def decode_image(bgr_img):
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    colors = ['GREEN', 'BLUE', 'RED']
+    colors = ['GREEN', 'BLUE', 'RED', 'PINK', 'ORANGE']
     # Color Boundaries BGR
     boundaries = [
+        ([3, 100, 100], [23, 255, 255]), # Starting color orange
         ([22, 100, 100], [42, 255, 255]), # Green
         ([121, 100, 100], [141, 255, 255]), # Blue
         ([165, 100, 100], [185, 255, 255]), # Red
+        ([140, 100, 100], [160, 255, 255]) # Ending color Pink
     ]
 
     # Bit-values:
     # Green: Most Significant Bit
     # Blue : middle Bit
     # Red : Least Significant Bit
-    bits = [0] * 3
+    bits = [0] * 4
 
     # loop over the boundaries
-    idx = 0
+    idx = -1
     for (lower, upper) in boundaries:
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
@@ -44,19 +47,23 @@ def decode_image(bgr_img):
         mask = cv2.inRange(hsv, lower, upper)
         output = cv2.bitwise_and(img, img, mask=mask)
         gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.01:
-            bits[idx] = 1
 
         # show the images
         cv2.namedWindow("{}-image".format(colors[idx]), cv2.WINDOW_NORMAL)
         cv2.resizeWindow("{}-image".format(colors[idx]), 1024, 768)
         cv2.imshow("{}-image".format(colors[idx]), np.hstack([img, output]))
+
+        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25 and idx == -1:
+            print("ORANGE: Start transmission")
+            idx += 1
+            continue
+        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.01 and idx < 3:
+            bits[idx] = 1
+        elif idx == 3 and cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25:
+            print("PINK: End transmission!")
+
         idx += 1
         cv2.waitKey(0)
-        print(bits)
 
+    return bits
 
-
-
-if __name__ == '__main__':
-    load_image()

@@ -1,9 +1,10 @@
 from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
+from client import image_decoder
 
 class SimpleEcho(WebSocket):
 
     def handleMessage(self):
-        print(self.data)
+        image_decoder
 
     def handleConnected(self):
         print(self.address, 'connected')
