@@ -16,7 +16,9 @@ import Starscream
     
     @IBOutlet weak var imageView: UIImageView!
         
-    var socket = WebSocket(url: URL(string: "ws://10.1.228.146:80/ws")!)
+//    var socket = WebSocket(url: URL(string: "ws://10.1.228.146:80/ws")!)
+    var socket = WebSocket(url: URL(string: "ws://192.168.0.100:80/ws")!)
+        
         
         
     override func viewDidLoad() {
@@ -28,7 +30,7 @@ import Starscream
     }
         
     func captured(image: UIImage) {
-        let jpegCompressionQuality: CGFloat = 1 // Set this to whatever suits your purpose
+        let jpegCompressionQuality: CGFloat = 0.1 // Set this to whatever suits your purpose
         if let base64String = UIImageJPEGRepresentation(image, jpegCompressionQuality)?.base64EncodedString() {
             socket.write(string: base64String)
         }
