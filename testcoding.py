@@ -10,7 +10,7 @@ import datetime
 tick = datetime.timedelta(milliseconds=500)
 
 scenes = {"000": 0, "001": 1, "010": 2, "011": 3, "100": 4, "101": 5, "110": 6, "111": 7}
-
+groupid = 1
 
 def say_nrz(bridge, data, lights):
     sent = 0
@@ -25,7 +25,7 @@ def say_nrz(bridge, data, lights):
         # for i in range(0, len(lights)):
         #    bridge.set_light(lights[i], {'on': not not data[sent], 'transitiontime': 0, 'bri': 255})
         scene_id = scenes[(''.join([str(x) for x in data[sent:sent + 3]]))]
-        bridge.run_scene("hueheffner", scene_id)
+        bridge.run_scene(groupid, scene_id)
         sent += 3
         end = datetime.datetime.now()
         elapsed = end - start
@@ -45,8 +45,8 @@ b.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': True, 'transitiontim
 b.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
 b.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
 time.sleep(1)
-if (not b.get_group(1, 'lights')):
-    b.create_group('hueheffner', [1, 2, 3])
+
+b.set_group(groupid, 'lights', [1,2,3])
 
 # brightness = 250
 # while(1):
