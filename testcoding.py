@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 from phue import Bridge
+import logging
+logging.basicConfig()
 import time
 import datetime
 
@@ -34,6 +36,7 @@ b.connect()
 
 # Get the bridge state (This returns the full dictionary that you can explore)
 b.get_api()
+
 
 b.set_light(1,{"hue":25500, "sat":255, "bri":255, 'on': True, 'transitiontime': 0})
 b.set_light(2,{"hue":46920, "sat":255, "bri":255, "on": True, 'transitiontime': 0})
