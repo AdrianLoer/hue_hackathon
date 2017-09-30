@@ -1,28 +1,32 @@
 #!/usr/bin/python
 
 from phue import Bridge
+from rgbxy import Converter
 import logging
 
 logging.basicConfig()
 import time
 import datetime
 
-tick = datetime.timedelta(milliseconds=230)
+tick = datetime.timedelta(milliseconds=250)
+converter = Converter()
+red = converter.rgb_to_xy(255, 0, 0)
+blue = converter.rgb_to_xy(0, 0, 255)
+green = converter.rgb_to_xy(0, 255, 0)
+purple = converter.rgb_to_xy(180, 14, 184)
 
 scenes = {"000": 0, "001": 1, "010": 2, "011": 3, "100": 4, "101": 5, "110": 6, "111": 7}
 groupid = 1
 
 def get_lightstate(light_no, on):
     if light_no == 1:
-        hue = 25500
+        color = green
     elif light_no == 2:
-        hue = 46920
+        color = blue
     else:
-        hue = 65280
+        color = red
     return {
-        'hue': hue,
-        'sat': 255,
-        'bri': 255,
+        'xy': color,
         'on': on,
         'transitiontime': 0
     } if on else {
@@ -66,6 +70,12 @@ def init_scenes(bridge):
     bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
     bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
     bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '111', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {'xy': purple, 'on':True, 'transitiontime': 0})
+    bridge.set_light(2, {'xy': purple, 'on': True, 'transitiontime': 0})
+    bridge.set_light(3, {'xy': purple, 'on': True, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/',
+                   data={'name': 'xxx', 'lights': ['1', '2', '3'], 'recycle': True})
+    #bridge.set_light(1, {'hue': })
     for scene in bridge.scenes:
         if scene.name in scenes.keys():
             one = True if scene.name[0] == '1' else False
@@ -78,6 +88,26 @@ def init_scenes(bridge):
             bridge.request(mode='PUT',
                            address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/3',
                            data=get_lightstate(3, three))
+        if scene.name == 'xxx':
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/1',
+                           data={'xy': purple, 'on': True, 'transitiontime': 0})
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/2',
+                           data={'xy': purple, 'on': True, 'transitiontime': 0})
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/3',
+                           data={'xy': purple, 'on': True, 'transitiontime': 0})
+
+
+def do_clocked(bridge, scene_id):
+    start = datetime.datetime.now()
+    bridge.request(mode='PUT', address='/api/' + bridge.username + '/groups/0/action',
+                   data={'scene': scene_id, 'transitiontime': 0})
+    end = datetime.datetime.now()
+    elapsed = end - start
+    wait_for = tick - elapsed
+    time.sleep(wait_for.total_seconds())
 
 
 def say_nrz(bridge, data, lights):
@@ -90,16 +120,15 @@ def say_nrz(bridge, data, lights):
     for scene in bridge.scenes:
         if scene.name in scenes.keys():
             scenes[scene.name] = scene.scene_id
+        if scene.name == 'xxx':
+            delim_id = scene.scene_id
+    do_clocked(bridge, delim_id)
     while sent < length:
-        start = datetime.datetime.now()
         scene_id = scenes[(''.join([str(x) for x in data[sent:sent + 3]]))]
-        bridge.request(mode='PUT', address='/api/' + bridge.username + '/groups/0/action',data={'scene': scene_id, 'transitiontime': 0})
-        #bridge.activate_scene(groupid, scene_id)
+        do_clocked(bridge, scene_id)
         sent += 3
-        end = datetime.datetime.now()
-        elapsed = end - start
-        wait_for = tick - elapsed
-        time.sleep(wait_for.total_seconds())
+    do_clocked(bridge, delim_id)
+
 
 
 b = Bridge('10.1.228.193')
