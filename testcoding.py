@@ -33,6 +33,41 @@ def say_nrz(bridge, data, lights):
         time.sleep(wait_for.total_seconds())
 
 
+def init_scenes(bridge):
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": False, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '0', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": False, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '1', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '2', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '3', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": False, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '4', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": False, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '5', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': False, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '6', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
+    bridge.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/', data={'name': '7', 'lights': ['1', '2', '3'], 'recycle': True})
+
+
 b = Bridge('10.1.228.193')
 
 # If the app is not registered and the button is not pressed, press the button and call connect() (this only needs to be run a single time)
@@ -45,7 +80,7 @@ b.set_light(1, {"hue": 25500, "sat": 255, "bri": 255, 'on': True, 'transitiontim
 b.set_light(2, {"hue": 46920, "sat": 255, "bri": 255, "on": True, 'transitiontime': 0})
 b.set_light(3, {"hue": 65280, "sat": 255, "bri": 255, 'on': True, 'transitiontime': 0})
 time.sleep(1)
-if (not b.get_group(1, 'lights')):
+if (not b.get_group(1, 'hueheffner')):
     b.create_group('hueheffner', [1, 2, 3])
 
 # brightness = 250
@@ -55,3 +90,4 @@ if (not b.get_group(1, 'lights')):
 # time.sleep(0.5)
 
 say_nrz(b, [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0], [1, 2, 3])
+init_scenes(b)
