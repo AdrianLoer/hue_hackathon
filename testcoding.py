@@ -15,6 +15,7 @@ red = converter.rgb_to_xy(255, 0, 0)
 blue = converter.rgb_to_xy(0, 0, 255)
 green = converter.rgb_to_xy(0, 255, 0)
 purple = converter.rgb_to_xy(180, 14, 184)
+orange = converter.rgb_to_xy(196, 65, 5)
 
 scenes = {"000": 0, "001": 1, "010": 2, "011": 3, "100": 4, "101": 5, "110": 6, "111": 7}
 groupid = 1
@@ -76,6 +77,11 @@ def init_scenes(bridge):
     bridge.set_light(3, {'xy': purple, 'on': True, 'transitiontime': 0})
     bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/',
                    data={'name': 'xxx', 'lights': ['1', '2', '3'], 'recycle': True})
+    bridge.set_light(1, {'xy': orange, 'on':True, 'transitiontime': 0})
+    bridge.set_light(2, {'xy': orange, 'on': True, 'transitiontime': 0})
+    bridge.set_light(3, {'xy': orange, 'on': True, 'transitiontime': 0})
+    bridge.request(mode='POST', address='/api/' + bridge.username + '/scenes/',
+                   data={'name': 'yyy', 'lights': ['1', '2', '3'], 'recycle': True})
     #bridge.set_light(1, {'hue': })
     for scene in bridge.scenes:
         if scene.name in scenes.keys():
@@ -99,6 +105,16 @@ def init_scenes(bridge):
             bridge.request(mode='PUT',
                            address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/3',
                            data={'xy': purple, 'on': True, 'transitiontime': 0})
+        if scene.name == 'yyy':
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/1',
+                           data={'xy': orange, 'on': True, 'transitiontime': 0})
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/2',
+                           data={'xy': orange, 'on': True, 'transitiontime': 0})
+            bridge.request(mode='PUT',
+                           address='/api/' + bridge.username + '/scenes/' + scene.scene_id + '/lightstates/3',
+                           data={'xy': orange, 'on': True, 'transitiontime': 0})
 
 
 def do_clocked(bridge, scene_id):
@@ -118,17 +134,20 @@ def say_nrz(bridge, data, lights):
     stuff = [0] * stuffing
     data = stuff + data
     length += stuffing
+    start_id = 0
     for scene in bridge.scenes:
         if scene.name in scenes.keys():
             scenes[scene.name] = scene.scene_id
         if scene.name == 'xxx':
             delim_id = scene.scene_id
-    do_clocked(bridge, delim_id)
+        if scene.name == 'yyy':
+            start_id = scene.scene_id
+    do_clocked(bridge, start_id) #start sequence
     while sent < length:
         scene_id = scenes[(''.join([str(x) for x in data[sent:sent + 3]]))]
         do_clocked(bridge, scene_id)
         sent += 3
-    do_clocked(bridge, delim_id)
+    do_clocked(bridge, delim_id) #end sequence
 
 
 
