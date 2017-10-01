@@ -14,13 +14,14 @@ images = [os.path.join(images_path, f) for f in os.listdir(images_path) if os.pa
 
 def decode(bitArray):
     s = ""
-    counter = 0
     bitBuffer = ""
-    while counter < len(bitArray):
-        bitBuffer = "".join([str(x) for x in bitArray[counter:counter+7]])
-        counter+=7
-        s += chr(int(bitBuffer,2))
-        bitBuffer = ""
+    for i in range(len(bitArray), 0, -7):
+        bitBuffer = bitArray[i-7:i]
+        x = "".join([str(x) for x in bitBuffer])
+        try:
+            s = chr(int(x, 2)) + s
+        except:
+            pass
     return s
 
 def reconstruct_message(bits):
