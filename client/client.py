@@ -12,6 +12,17 @@ images_path = "/home/rob/workspace/Hue_hackerthon/client/images/"
 
 images = [os.path.join(images_path, f) for f in os.listdir(images_path) if os.path.isfile(os.path.join(images_path, f))]
 
+def decode(bitArray):
+    s = ""
+    counter = 0
+    bitBuffer = ""
+    while counter < len(bitArray):
+        bitBuffer = "".join([str(x) for x in bitArray[counter:counter+7]])
+        counter+=7
+        s += chr(int(bitBuffer,2))
+        bitBuffer = ""
+    return s
+
 def reconstruct_message(bits):
     message.extend(bits)
     print(message)
@@ -32,3 +43,4 @@ def receive_data(images):
 if __name__ == "__main__":
     images_ordered = sorted(images, key=lambda x: (int(re.sub('\D', '', x)), x))
     receive_data(images_ordered)
+    print(decode(message))

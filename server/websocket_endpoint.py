@@ -4,7 +4,7 @@ from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 class SimpleEcho(WebSocket):
 
     def handleMessage(self):
-        image_decoder
+        pass
 
     def handleConnected(self):
         print(self.address, 'connected')
