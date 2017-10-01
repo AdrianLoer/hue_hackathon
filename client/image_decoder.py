@@ -71,6 +71,7 @@ def decode_image(bgr_img, running=False):
             bits[idx] = 1
         elif idx == 3 and cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25:
             print("PINK: End transmission!")
+            return None
 
         idx += 1
 
