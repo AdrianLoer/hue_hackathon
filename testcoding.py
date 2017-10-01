@@ -130,7 +130,7 @@ def do_clocked(bridge, scene_id):
 def say_nrz(bridge, data, lights):
     sent = 0
     length = len(data)
-    stuffing = length % len(lights)
+    stuffing = 3 - (length % len(lights))
     stuff = [0] * stuffing
     data = stuff + data
     length += stuffing
@@ -144,7 +144,10 @@ def say_nrz(bridge, data, lights):
             start_id = scene.scene_id
     do_clocked(bridge, start_id) #start sequence
     while sent < length:
-        scene_id = scenes[(''.join([str(x) for x in data[sent:sent + 3]]))]
+        try:
+            scene_id = scenes[(''.join([str(x) for x in data[sent:sent + 3]]))]
+        except:
+            print(data)
         do_clocked(bridge, scene_id)
         sent += 3
     do_clocked(bridge, delim_id) #end sequence
