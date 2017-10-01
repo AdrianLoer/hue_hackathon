@@ -61,13 +61,7 @@ def decode_image(bgr_img, running=False):
         output = cv2.bitwise_and(img, img, mask=mask)
         gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
 
-        # show the images
-        #cv2.namedWindow("{}-image".format(colors[idx]), cv2.WINDOW_NORMAL)
-        #cv2.resizeWindow("{}-image".format(colors[idx]), 1024, 768)
-        #cv2.imshow("{}-image".format(colors[idx]), np.hstack([img, output]))
-
-
-        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.01 and idx < 3:
+        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.02 and idx < 3:
             bits[idx] = 1
         elif idx == 3 and cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25:
             print("PINK: End transmission!")

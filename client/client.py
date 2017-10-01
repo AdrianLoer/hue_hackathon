@@ -34,6 +34,7 @@ def receive_data(images):
         bits = image_decoder.decode_image(bgr_image, running)
         if bits:
             reconstruct_message(bits[:3])
+            print(bits[:3])
         else:
             running = True
 
