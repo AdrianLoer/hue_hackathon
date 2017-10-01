@@ -175,7 +175,7 @@ b.set_group(groupid, 'lights', [1,2,3])
 # b.set_light(1,{'transitiontime': 0, 'on': True, 'hue': brightness})
 # time.sleep(0.5)
 
-
+#init_scenes(b)
 if len(sys.argv) > 1:
     words = ' '.join(sys.argv[1:])
     chars = [bin(ord(x)) for x in words]
@@ -187,5 +187,4 @@ if len(sys.argv) > 1:
     say_nrz(b, accu, [1, 2, 3])
 else:
     say_nrz(b, [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0], [1, 2, 3])
-#init_scenes(b)
 
