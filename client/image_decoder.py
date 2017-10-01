@@ -6,8 +6,6 @@ import numpy as np
 
 IMAGE_SIZE = (128, 128)
 
-running = False
-
 def load_image(base64_string):
     sbuf = StringIO()
     sbuf.write(base64.decodebytes(base64_string))
@@ -15,15 +13,15 @@ def load_image(base64_string):
     return cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
 
 
-def decode_image(bgr_img):
+def decode_image(bgr_img, running=False):
     img = cv2.resize(bgr_img, IMAGE_SIZE)
 
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    colors = ['GREEN', 'BLUE', 'RED', 'PINK', 'ORANGE']
+    #colors = ['GREEN', 'BLUE', 'RED', 'PINK', 'ORANGE']
     # Color Boundaries BGR
+    start_boundaries = ([3, 100, 100], [23, 255, 255]) # Starting color orange
     boundaries = [
-        ([3, 100, 100], [23, 255, 255]), # Starting color orange
         ([22, 100, 100], [42, 255, 255]), # Green
         ([121, 100, 100], [141, 255, 255]), # Blue
         ([165, 100, 100], [185, 255, 255]), # Red
@@ -37,7 +35,22 @@ def decode_image(bgr_img):
     bits = [0] * 4
 
     # loop over the boundaries
-    idx = -1
+
+    while not running:
+        lower = np.array(start_boundaries[0], dtype="uint8")
+        upper = np.array(start_boundaries[1], dtype="uint8")
+
+        mask = cv2.inRange(hsv, lower, upper)
+        output = cv2.bitwise_and(img, img, mask=mask)
+        gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+
+        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25:
+            print("ORANGE: Start transmission")
+            running = True
+            return None
+
+
+    idx = 0
     for (lower, upper) in boundaries:
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
@@ -49,21 +62,17 @@ def decode_image(bgr_img):
         gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
 
         # show the images
-        cv2.namedWindow("{}-image".format(colors[idx]), cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("{}-image".format(colors[idx]), 1024, 768)
-        cv2.imshow("{}-image".format(colors[idx]), np.hstack([img, output]))
+        #cv2.namedWindow("{}-image".format(colors[idx]), cv2.WINDOW_NORMAL)
+        #cv2.resizeWindow("{}-image".format(colors[idx]), 1024, 768)
+        #cv2.imshow("{}-image".format(colors[idx]), np.hstack([img, output]))
 
-        if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25 and idx == -1:
-            print("ORANGE: Start transmission")
-            idx += 1
-            continue
+
         if cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.01 and idx < 3:
             bits[idx] = 1
         elif idx == 3 and cv2.countNonZero(gray)/(IMAGE_SIZE[0]*IMAGE_SIZE[1]) > 0.25:
             print("PINK: End transmission!")
 
         idx += 1
-        cv2.waitKey(0)
 
     return bits
 
